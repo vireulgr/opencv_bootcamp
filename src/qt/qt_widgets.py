@@ -1,49 +1,47 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt6 import QtWidgets
 
 import sys
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.setWindowTitle('App')
 
-        layout = QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
 
-        widgets = [ QCheckBox,
-                   QComboBox,
-                   QDateEdit,
-                   QDateTimeEdit,
-                   QDial,
-                   QDoubleSpinBox,
-                   QLCDNumber,
-                   QLabel,
-                   QLineEdit,
-                   QProgressBar,
-                   QPushButton,
-                   QRadioButton,
-                   QSlider,
-                   QSpinBox,
-                   QTimeEdit]
+        widgets = [ QtWidgets.QCheckBox,
+                   QtWidgets.QComboBox,
+                   QtWidgets.QDateEdit,
+                   QtWidgets.QDateTimeEdit,
+                   QtWidgets.QDial,
+                   QtWidgets.QDoubleSpinBox,
+                   QtWidgets.QLCDNumber,
+                   QtWidgets.QLabel,
+                   QtWidgets.QLineEdit,
+                   QtWidgets.QProgressBar,
+                   QtWidgets.QPushButton,
+                   QtWidgets.QRadioButton,
+                   QtWidgets.QSlider,
+                   QtWidgets.QSpinBox,
+                   QtWidgets.QTimeEdit]
 
         for w in widgets:
             layout.addWidget(w())
 
-        widget = QWidget()
+        widget = QtWidgets.QWidget()
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
 
 
 
-app = QApplication(sys.argv)
+app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
 
 window.show()
 
-app.exec_()
+app.exec()
 

@@ -1,11 +1,9 @@
-from PyQt5.QtWidgets import  *
-from PyQt5.QtCore import  *
-from PyQt5.QtGui import  *
+from PyQt6 import QtWidgets, QtCore
 
 import sys
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -18,9 +16,9 @@ class MainWindow(QMainWindow):
 
         self.windowTitleChanged.connect(lambda x: self.my_custom_fn(x))
 
-        label = QLabel('this is awesome!')
+        label = QtWidgets.QLabel('this is awesome!')
 
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         self.setCentralWidget(label)
 
@@ -29,21 +27,19 @@ class MainWindow(QMainWindow):
     def my_custom_fn(self, arg = 'hello'):
         print(arg)
 
-
     def onWindowTitleChange(self, title):
         print(title)
-
 
     # has the same name as in parent class
     def contextMenuEvent(self, event):
         super(MainWindow, self).contextMenuEvent(event)
 
 
-app = QApplication(sys.argv)
+app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
 
 window.show()
 
-app.exec_()
+app.exec()
 
