@@ -17,7 +17,7 @@ class ScrollableWindow(QtWidgets.QMainWindow):
         self.widget = QtWidgets.QWidget()
         self.setCentralWidget(self.widget)
         self.widget.setLayout(QtWidgets.QVBoxLayout())
-        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.widget.layout().setContentsMargins(0, 0, 0, 0)
         self.widget.layout().setSpacing(0)
 
         self.fig = fig
@@ -33,9 +33,9 @@ class ScrollableWindow(QtWidgets.QMainWindow):
 
 def window():
     # create a figure and some subplots
-    fig, axes = plt.subplots(ncols=4, nrows=5, figsize=(16,16))
+    fig, axes = plt.subplots(ncols=4, nrows=5, figsize=(16, 16))
     for ax in axes.flatten():
-        ax.plot([2,3,5,1])
+        ax.plot([2, 3, 5, 1])
 
     app = QtWidgets.QApplication(sys.argv)
 
