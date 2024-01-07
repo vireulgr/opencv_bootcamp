@@ -1,4 +1,10 @@
+'''
+    this is a module wasya
+'''
 import sys
+import yaml
+
+from pathlib import Path
 from PyQt6 import QtWidgets
 
 from ui import MyMainWindow
@@ -7,27 +13,50 @@ qApp = QtWidgets.QApplication(sys.argv)
 
 if len(sys.argv) < 2:
     print(f'usage: {sys.argv[0]} <chapter number>')
-    exit(0)
+    sys.exit(0)
+
+
+configPath = Path(sys.argv[0]).parent.parent / 'config.yaml'
+
+if not configPath.exists():
+    raise Exception(f'[E] cannot find config file {configPath}!')
+
+with open(configPath, 'r') as conf:
+    configObject = yaml.load(conf, yaml.Loader)
+
+if not configObject:
+    raise Exception('Cannot load config')
 
 
 chapterNumber = int(sys.argv[1])
+
+assetsDirectory = Path(configObject['common']['assetsRoot']) / str(chapterNumber)
+
+chapterConfig = configObject['chapters'][chapterNumber - 1]
+
+chapterConfig.update(assetsDir=assetsDirectory)
+
 if chapterNumber < 1 or chapterNumber > 3:
     print(f'Wrong chapter number: {chapterNumber}; must be between 1 and 3')
     del qApp
-    exit(0)
+    sys.exit(0)
 
 if chapterNumber == 3:
     import basic_image_enhancements
-    instance = basic_image_enhancements.classFactory({})
+    instance = basic_image_enhancements.classFactory(chapterConfig)
     result = instance.work()
 
-    window = MyMainWindow()
+    myMainWindow = MyMainWindow()
 
-    window.addImageGroup(result[0], 'Addition (brightness)')
-    window.addImageGroup(result[1], 'Multiplication (contrast)')
-    window.addImageGroup(result[2], 'Threshold')
-    window.addImageGroup(result[3], 'Adaptive threshold')
-    window.show()
+    myMainWindow.addImageGroup(result[0], 'Addition (brightness)')
+    myMainWindow.addImageGroup(result[1], 'Multiplication (contrast)')
+    myMainWindow.addImageGroup(result[2], 'Threshold')
+    myMainWindow.addImageGroup(result[3], 'Adaptive threshold')
+    myMainWindow.addImageGroup(result[4], 'Sample images for bitwise operations')
+    myMainWindow.addImageGroup(result[5], 'Bitwise and, bitwise or, bitwise xor')
+    myMainWindow.addImageGroup(result[6], 'Images for task')
+    myMainWindow.addImageGroup(result[7], 'Task process 1')
+    myMainWindow.show()
 
     # maxWidth = 0
     # maxHeight = 0
@@ -37,7 +66,7 @@ if chapterNumber == 3:
     #     maxHeight = img.shape[0] if img.shape[0] > maxHeight else maxHeight
 
     # window.resize(maxWidth + 40, maxHeight)
-    window.resize(950, 650)
+    myMainWindow.resize(950, 650)
 
 # elif chapterNumber == 2:
 #     import getting_started_with_images
@@ -50,6 +79,6 @@ if chapterNumber == 3:
 else:
     del qApp
     print(f'not valid chapter name: {chapterNumber}')
-    exit(0)
+    sys.exit(0)
 
-exit(qApp.exec())
+sys.exit(qApp.exec())

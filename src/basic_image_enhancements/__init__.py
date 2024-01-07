@@ -1,5 +1,4 @@
-import sys
-import yaml
+# import sys
 import cv2 as cv
 import numpy as np
 from pathlib import Path
@@ -9,27 +8,28 @@ from utils import downloadAndUnzip
 
 
 class ChapterModule(object):
-    configPath = Path(sys.argv[0]).parent.parent / 'config.yaml'
-    chapterNumber = 2
+    # configPath = Path(sys.argv[0]).parent.parent / 'config.yaml'
+    # chapterNumber = 2
 
-    def __init__(self):
-        self.configObject = {}
+    def __init__(self, config):
+        self.configObject = config
 
-        if not self.configPath.exists():
-            raise Exception(f'[E] cannot find config file {self.configPath}!')
+        # if not self.configPath.exists():
+        #     raise Exception(f'[E] cannot find config file {self.configPath}!')
 
-        with open(self.configPath, 'r') as conf:
-            self.configObject = yaml.load(conf, yaml.Loader)
+        # with open(self.configPath, 'r') as conf:
+        #     self.configObject = yaml.load(conf, yaml.Loader)
 
-        if not self.configObject:
-            raise Exception('Cannot load config')
+        # if not self.configObject:
+        #     raise Exception('Cannot load config')
 
-        self.configObject = self.configObject['chapters'][self.chapterNumber]
+        # self.configObject = self.configObject['chapters'][self.chapterNumber]
 
         # print(Path.cwd())
         # print(Path(sys.argv[0]).parent)
 
-        self.assetsDirectory = self.configPath.parent / 'assets' / str(self.chapterNumber + 1)
+        # self.assetsDirectory = self.configPath.parent / 'assets' / str(self.chapterNumber + 1)
+        self.assetsDirectory = Path(self.configObject['assetsDir'])
 
         self.assetsDirectory.mkdir(parents=True, exist_ok=True)
 
@@ -107,7 +107,7 @@ class ChapterModule(object):
 
         sheetMusicAdaptiveThresholdedImg = cv.adaptiveThreshold(sheetMusicImg, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 11, 7)
 
-        cv.imwrite(str(self.assetsDirectory / 'Piano_Sheet_Music_thresh.png'), sheetMusicAdaptiveThresholdedImg)
+        # cv.imwrite(str(self.assetsDirectory / 'Piano_Sheet_Music_thresh.png'), sheetMusicAdaptiveThresholdedImg)
 
         # print(buildingImg.shape, buildingImg.dtype)
         # print(maskImg.shape, maskImg.dtype)
@@ -117,16 +117,103 @@ class ChapterModule(object):
             Image.fromarray(sheetMusicAdaptiveThresholdedImg, mode='L')
         )
 
+    def bitwiseSampleImages(self):
+        circleImagePath = self.assetsDirectory / 'circle.jpg'
+        if not circleImagePath.exists():
+            print(f'[E] Path not exists: {str(circleImagePath)}')
+            return ()
+
+        rectangleImagePath = self.assetsDirectory / 'rectangle.jpg'
+        if not rectangleImagePath.exists():
+            print(f'[E] Path not exists: {str(rectangleImagePath)}')
+            return ()
+
+        circleImage = cv.imread(str(circleImagePath), cv.IMREAD_GRAYSCALE)
+        rectangleImage = cv.imread(str(rectangleImagePath), cv.IMREAD_GRAYSCALE)
+
+        return (
+            Image.fromarray(circleImage, mode='L'),
+            Image.fromarray(rectangleImage, mode='L')
+        )
+
+    def simpleBitwiseOperations(self):
+        circleImagePath = self.assetsDirectory / 'circle.jpg'
+        if not circleImagePath.exists():
+            print(f'[E] Path not exists: {str(circleImagePath)}')
+            return ()
+
+        rectangleImagePath = self.assetsDirectory / 'rectangle.jpg'
+        if not rectangleImagePath.exists():
+            print(f'[E] Path not exists: {str(rectangleImagePath)}')
+            return ()
+
+        circleImage = cv.imread(str(circleImagePath), cv.IMREAD_GRAYSCALE)
+        rectangleImage = cv.imread(str(rectangleImagePath), cv.IMREAD_GRAYSCALE)
+
+        andImageResult = cv.bitwise_and(circleImage, rectangleImage)
+        orImageResult = cv.bitwise_or(circleImage, rectangleImage)
+        xorImageResult = cv.bitwise_xor(circleImage, rectangleImage)
+
+        return (
+            Image.fromarray(andImageResult, mode='L'),
+            Image.fromarray(orImageResult, mode='L'),
+            Image.fromarray(xorImageResult, mode='L'),
+        )
+
+    def cokeAndMosaic(self):
+
+        cokeImagePath = self.assetsDirectory / 'coca-cola-logo.png'
+        if not cokeImagePath.exists():
+            print(f'[E] Path not exists: {str(cokeImagePath)}')
+            return ()
+
+        mosaicImagePath = self.assetsDirectory / 'checkerboard_color.png'
+        if not mosaicImagePath.exists():
+            print(f'[E] Path not exists: {str(mosaicImagePath)}')
+            return ()
+
+        cokeImage = cv.imread(str(cokeImagePath), cv.IMREAD_COLOR)
+        mosaicImage = cv.imread(str(mosaicImagePath), cv.IMREAD_COLOR)
+
+        return (
+            Image.fromarray(cokeImage[:, :, ::-1], mode='RGB'),
+            Image.fromarray(mosaicImage[:, :, ::-1], mode='RGB'),
+        )
+
+    def task(self):
+
+        cokeImagePath = self.assetsDirectory / 'coca-cola-logo.png'
+        if not cokeImagePath.exists():
+            print(f'[E] Path not exists: {str(cokeImagePath)}')
+            return ()
+
+        mosaicImagePath = self.assetsDirectory / 'Logo_Manipulation.png'
+        if not mosaicImagePath.exists():
+            print(f'[E] Path not exists: {str(mosaicImagePath)}')
+            return ()
+
+        cokeImage = cv.imread(str(cokeImagePath), cv.IMREAD_COLOR)
+        mosaicImage = cv.imread(str(mosaicImagePath), cv.IMREAD_COLOR)
+
+        return (
+            Image.fromarray(cokeImage[:, :, ::-1], mode='RGB'),
+            Image.fromarray(mosaicImage[:, :, ::-1], mode='RGB'),
+        )
+
     def work(self):
         return (
             self.imageAddition(),
             self.imageMultiplication(),
             self.thresholdSimple(),
             self.thresholdSheetMusic(),
+            self.bitwiseSampleImages(),
+            self.simpleBitwiseOperations(),
+            self.cokeAndMosaic(),
+            self.task(),
         )
 
 
 ################################################################################
-def classFactory(data):
+def classFactory(config):
 
-    return ChapterModule()
+    return ChapterModule(config)

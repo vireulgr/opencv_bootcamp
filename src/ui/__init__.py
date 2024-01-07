@@ -65,4 +65,3 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.verticalLayout.addWidget(QtWidgets.QLabel(title))
 
         self.verticalLayout.addLayout(horizontalLayout)
-
