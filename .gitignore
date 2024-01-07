@@ -161,3 +161,6 @@ cython_debug/
 
 
 /assets/
+
+# vim swap files
+*.sw[a-z]
