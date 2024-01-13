@@ -9,7 +9,6 @@ from PyQt6 import QtWidgets
 
 from ui import MyMainWindow
 
-qApp = QtWidgets.QApplication(sys.argv)
 
 if len(sys.argv) < 2:
     print(f'usage: {sys.argv[0]} <chapter number>')
@@ -38,10 +37,10 @@ chapterConfig.update(assetsDir=assetsDirectory)
 
 if chapterNumber < 1 or chapterNumber > 3:
     print(f'Wrong chapter number: {chapterNumber}; must be between 1 and 3')
-    del qApp
     sys.exit(0)
 
 if chapterNumber == 3:
+    qApp = QtWidgets.QApplication(sys.argv)
     import basic_image_enhancements
     instance = basic_image_enhancements.classFactory(chapterConfig)
     result = instance.work()
@@ -55,18 +54,19 @@ if chapterNumber == 3:
     myMainWindow.addImageGroup(result[4], 'Sample images for bitwise operations')
     myMainWindow.addImageGroup(result[5], 'Bitwise and, bitwise or, bitwise xor')
     myMainWindow.addImageGroup(result[6], 'Images for task')
-    myMainWindow.addImageGroup(result[7], 'Task process 1')
+    myMainWindow.addImageGroup(result[7], 'Image overlay')
     myMainWindow.show()
 
-    # maxWidth = 0
-    # maxHeight = 0
-    # for img in images:
-    #     # print(img.shape)
-    #     maxWidth = img.shape[1] if img.shape[1] > maxWidth else maxWidth
-    #     maxHeight = img.shape[0] if img.shape[0] > maxHeight else maxHeight
-
-    # window.resize(maxWidth + 40, maxHeight)
+    myMainWindow.setWindowTitle('Image enhancements')
     myMainWindow.resize(950, 650)
+
+    sys.exit(qApp.exec())
+
+elif chapterNumber == 4:
+    import camera_intro
+    instance = camera_intro.classFactory(chapterConfig)
+    result = instance.work()
+
 
 # elif chapterNumber == 2:
 #     import getting_started_with_images
@@ -77,8 +77,6 @@ if chapterNumber == 3:
 #     import basic_image_manipulation
 #     exit(basic_image_manipulation.run())
 else:
-    del qApp
     print(f'not valid chapter name: {chapterNumber}')
     sys.exit(0)
 
-sys.exit(qApp.exec())

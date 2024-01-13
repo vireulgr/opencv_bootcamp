@@ -187,7 +187,7 @@ class ChapterModule(object):
             print(f'[E] Path not exists: {str(cokeImagePath)}')
             return ()
 
-        mosaicImagePath = self.assetsDirectory / 'Logo_Manipulation.png'
+        mosaicImagePath = self.assetsDirectory / 'checkerboard_color.png'
         if not mosaicImagePath.exists():
             print(f'[E] Path not exists: {str(mosaicImagePath)}')
             return ()
@@ -195,9 +195,26 @@ class ChapterModule(object):
         cokeImage = cv.imread(str(cokeImagePath), cv.IMREAD_COLOR)
         mosaicImage = cv.imread(str(mosaicImagePath), cv.IMREAD_COLOR)
 
+        dims = (cokeImage.shape[0], cokeImage.shape[1])
+        mosaicResizedImage = cv.resize(mosaicImage, dims)
+
+        cokeMonoImage = cv.cvtColor(cokeImage, cv.COLOR_BGR2GRAY)
+        _, cokeTextMask = cv.threshold(cokeMonoImage, 200, 255, cv.THRESH_BINARY)
+        _, cokeBackMask = cv.threshold(cokeMonoImage, 200, 255, cv.THRESH_BINARY_INV)
+
+        mosaicOnTextImage = cv.bitwise_and(mosaicResizedImage, mosaicResizedImage, mask=cokeTextMask)
+
+        cokeBackOnlyImage = cv.bitwise_and(cokeImage, cokeImage, mask=cokeBackMask)
+
+        resultImage = cv.bitwise_or(mosaicOnTextImage, cokeBackOnlyImage)
+
         return (
-            Image.fromarray(cokeImage[:, :, ::-1], mode='RGB'),
-            Image.fromarray(mosaicImage[:, :, ::-1], mode='RGB'),
+            Image.fromarray(mosaicOnTextImage[:, :, ::-1], mode='RGB'),
+            Image.fromarray(cokeBackOnlyImage[:, :, ::-1], mode='RGB'),
+            Image.fromarray(resultImage[:, :, ::-1], mode='RGB'),
+            # Image.fromarray(cokeMonoImage, mode='L'),
+            # Image.fromarray(cokeTextMask, mode='L'),
+            # Image.fromarray(cokeBackMask, mode='L'),
         )
 
     def work(self):
