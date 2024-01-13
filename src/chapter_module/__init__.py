@@ -9,6 +9,9 @@ class ChapterModule(object):
         self.assetsDirectory = Path(self.configObject['assetsDir'])
         self.assetsDirectory.mkdir(parents=True, exist_ok=True)
 
+        if 'resourcesFileName' not in self.configObject:
+            return
+
         assetsZipPath = self.assetsDirectory / self.configObject['resourcesFileName']
 
         # print(assetsZipPath)

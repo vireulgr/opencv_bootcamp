@@ -1,5 +1,5 @@
 '''
-    this is a module wasya
+    this is a main module
 '''
 import sys
 import yaml
@@ -8,6 +8,24 @@ from pathlib import Path
 from PyQt6 import QtWidgets
 
 from ui import MyMainWindow
+
+
+def loadConfigForChapter(chapterNumber):
+    configPath = Path(str(chapterNumber)).parent.parent / 'config.yaml'
+
+    if not configPath.exists():
+        raise Exception(f'[E] cannot find config file {configPath}!')
+
+    with open(configPath, 'r') as conf:
+        configObject = yaml.load(conf, yaml.Loader)
+
+    assetsDirectory = Path(configObject['common']['assetsRoot']) / str(chapterNumber)
+
+    chapterConfig = configObject['chapters'][chapterNumber - 1]
+
+    chapterConfig.update(assetsDir=assetsDirectory)
+
+    return chapterConfig
 
 
 def getting_started_with_images_():
@@ -31,7 +49,7 @@ def basic_image_enhancements_(config):
     myMainWindow.addImageGroup(result[4], 'Sample images for bitwise operations')
     myMainWindow.addImageGroup(result[5], 'Bitwise and, bitwise or, bitwise xor')
     myMainWindow.addImageGroup(result[6], 'Images for task')
-    myMainWindow.addImageGroup(result[7], 'Task process 1')
+    myMainWindow.addImageGroup(result[7], 'Image overlay')
 
     myMainWindow.setWindowTitle('Image enhancements')
     myMainWindow.resize(950, 650)
@@ -41,12 +59,34 @@ def basic_image_enhancements_(config):
 
 
 def video_intro_(config):
-    pass
+    import video_intro
+    instance = video_intro.classFactory(config)
+    try:
+        instance.init()
+        instance.show()
+    except Exception as e:
+        print('Exception!', str(e))
+    finally:
+        instance.cleanup()
+
+def video_writing_(config):
+    import video_writing
+    instance = video_writing.classFactory(config)
+    try:
+        instance.init()
+        instance.writeToDisk()
+        # instance.show()
+    except Exception as e:
+        print('Exception!', str(e))
+    finally:
+        instance.cleanup()
 
 
 chaptersDict = {
     2: getting_started_with_images_,
-    3: basic_image_enhancements_
+    3: basic_image_enhancements_,
+    4: video_intro_,
+    5: video_writing_,
 }
 
 
@@ -56,17 +96,6 @@ def main(argv):
         print(f'usage: {argv[0]} <chapter number>')
         sys.exit(0)
 
-    configPath = Path(argv[0]).parent.parent / 'config.yaml'
-
-    if not configPath.exists():
-        raise Exception(f'[E] cannot find config file {configPath}!')
-
-    with open(configPath, 'r') as conf:
-        configObject = yaml.load(conf, yaml.Loader)
-
-    if not configObject:
-        raise Exception('[E] Cannot load config')
-
     chapterNumber = int(argv[1])
 
     if chapterNumber not in chaptersDict:
@@ -74,15 +103,11 @@ def main(argv):
         print(f'must be in ({", ".join(map(str, chaptersDict.keys()))})')
         sys.exit(0)
 
-    assetsDirectory = Path(configObject['common']['assetsRoot']) / str(chapterNumber)
-
-    chapterConfig = configObject['chapters'][chapterNumber - 1]
-
-    chapterConfig.update(assetsDir=assetsDirectory)
+    chapterConfig = loadConfigForChapter(chapterNumber)
 
     chaptersDict[chapterNumber](chapterConfig)
 
 
 if __name__ == '__main__':
     main(sys.argv)
-# >>>>>>> 741ccefa1fdb1b8cc3d4709bc3534f700a9236d5
+
