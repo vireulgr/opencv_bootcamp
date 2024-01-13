@@ -1,42 +1,14 @@
-# import sys
 import cv2 as cv
 import numpy as np
-from pathlib import Path
 from PIL import Image
 
-from utils import downloadAndUnzip
+from chapter_module import ChapterModule
 
 
-class ChapterModule(object):
-    # configPath = Path(sys.argv[0]).parent.parent / 'config.yaml'
-    # chapterNumber = 2
+class BasicImageEnhancementsChapter(ChapterModule):
 
     def __init__(self, config):
-        self.configObject = config
-
-        # if not self.configPath.exists():
-        #     raise Exception(f'[E] cannot find config file {self.configPath}!')
-
-        # with open(self.configPath, 'r') as conf:
-        #     self.configObject = yaml.load(conf, yaml.Loader)
-
-        # if not self.configObject:
-        #     raise Exception('Cannot load config')
-
-        # self.configObject = self.configObject['chapters'][self.chapterNumber]
-
-        # print(Path.cwd())
-        # print(Path(sys.argv[0]).parent)
-
-        # self.assetsDirectory = self.configPath.parent / 'assets' / str(self.chapterNumber + 1)
-        self.assetsDirectory = Path(self.configObject['assetsDir'])
-
-        self.assetsDirectory.mkdir(parents=True, exist_ok=True)
-
-        assetsZipPath = self.assetsDirectory / self.configObject['resourcesFileName']
-
-        if not assetsZipPath.exists():
-            downloadAndUnzip(self.configObject['resourcesUrl'], assetsZipPath)
+        super().__init__(config)
 
     def imageAddition(self):
         filePath = self.assetsDirectory / 'New_Zealand_Coast.jpg'
@@ -233,4 +205,4 @@ class ChapterModule(object):
 ################################################################################
 def classFactory(config):
 
-    return ChapterModule(config)
+    return BasicImageEnhancementsChapter(config)
